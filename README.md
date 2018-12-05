@@ -1,7 +1,6 @@
 gsnova openshift v3 docker  
     
-alpine 3.7 golang 1.10  
-0.32.1 commit cee73a4 Mar 31,2018  
+alpine 3.7 golang master 1.12  tls 1.3    
   
 https://github.com/devcodewak/avonsg  
 https://hub.docker.com/r/devcodewak/avonsg/  

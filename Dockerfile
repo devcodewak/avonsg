@@ -1,6 +1,6 @@
-FROM alpine:3.7
+FROM alpine:3.7 as builder
 
-ENV GOLANG_MASTER_VERSION 1.12.1205
+ENV GOLANG_MASTER_VERSION go1.12.1205
 ENV GOLANG_COMMIT 9be01c2eab928f9899c67eb7bcdb164728f85a2c
 ENV GOLANG_SRC_URL https://github.com/golang/go/archive/$GOLANG_COMMIT.tar.gz 
 
@@ -41,8 +41,6 @@ RUN set -eux; \
 	cd /usr/local/go/src; \
 	./make.bash; \
 	\
-	apk del .build-deps; \
-	\
 	export PATH="/usr/local/go/bin:$PATH"; \
 	go version; \
 	\
@@ -54,18 +52,20 @@ RUN set -eux; \
 	apk add --update git; \
 	go get -d github.com/devcodewak/avonsg_openshift/cmd; \
 	go build -ldflags="-s -w" -o /go/bin/web github.com/devcodewak/avonsg_openshift/cmd; \
-	rm -rf /go/src/github.com/; \
-	rm -rf /usr/local/go/; \
-	apk del git; \
-	rm -rf /var/cache/apk/* /tmp/*; \
 	\
 	\
 	export PATH="$GOPATH/bin:$PATH"; \
 	/go/bin/web -version
 
 
-ENV PATH $GOPATH/bin:$PATH
-WORKDIR $GOPATH
+FROM alpine:3.7
 
-CMD ["/go/bin/web", "-server", "-cmd", "-key", "809240d3a021449f6e67aa73221d42df942a308a", "-listen", "http2://:8443", "-listen", "http://:8444", "-log", "null"]
+WORKDIR /bin/
+
+COPY --from=builder /go/bin/web .
+
+RUN web -version
+
+CMD ["/bin/web", "-server", "-cmd", "-key", "809240d3a021449f6e67aa73221d42df942a308a", "-listen", "http2://:8443", "-listen", "http://:8444", "-log", "null"]
+
 EXPOSE 8443 8444
