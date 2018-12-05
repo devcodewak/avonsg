@@ -1,7 +1,9 @@
 FROM alpine:3.7
 
-ENV GOLANG_VERSION 1.11.2
-ENV GOLANG_SHA256 042fba357210816160341f1002440550e952eb12678f7c9e7e9d389437942550
+ENV GOLANG_MASTER_VERSION 1.12.1205
+ENV GOLANG_COMMIT 9be01c2eab928f9899c67eb7bcdb164728f85a2c
+ENV GOLANG_SRC_URL https://github.com/golang/go/archive/$GOLANG_COMMIT.tar.gz 
+
 ENV GOPATH /go
 
 RUN set -eux; \
@@ -31,10 +33,9 @@ RUN set -eux; \
 		x86) export GO386='387' ;; \
 	esac; \
 	\
-	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo "$GOLANG_SHA256 *go.tgz" | sha256sum -c -; \
-	tar -C /usr/local -xzf go.tgz; \
-	rm go.tgz; \
+	mkdir -p /usr/local/go; \
+	curl -fSL $GOLANG_SRC_URL | tar -zxC /usr/local/go --strip-components=1; \
+	echo $GOLANG_MASTER_VERSION > /usr/local/go/VERSION; \
 	\
 	cd /usr/local/go/src; \
 	./make.bash; \
