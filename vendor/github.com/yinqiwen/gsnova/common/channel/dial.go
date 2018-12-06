@@ -111,12 +111,12 @@ func DialServerByConf(server string, conf *ProxyChannelConfig) (net.Conn, error)
 			fallthrough
 		case "http2":
 			tlscfg.MaxVersion = tls.VersionTLS13
-			tlscfg.MinVersion = tls.VersionTLS13
-			tlscfg.CipherSuites = []uint16{
-				tls.TLS_AES_128_GCM_SHA256,
-				tls.TLS_AES_256_GCM_SHA384,
-				tls.TLS_CHACHA20_POLY1305_SHA256,
-			}
+			tlscfg.MinVersion = tls.VersionTLS12
+			// tlscfg.CipherSuites = []uint16{
+			// 	tls.TLS_AES_128_GCM_SHA256,
+			// 	tls.TLS_AES_256_GCM_SHA384,
+			// 	tls.TLS_CHACHA20_POLY1305_SHA256,
+			// }
 			tlsconn := tls.Client(conn, tlscfg)
 			err = tlsconn.Handshake()
 			if err != nil {
